@@ -67,43 +67,134 @@ AuctionSystem/
 ---
 
 ## Requisiti
-- **Java 21+**
-- **Apache Maven**
-- IDE a scelta (IntelliJ, Eclipse, VS Code, ecc.)
+- **Java 21 o superiore**
+- *(Opzionale)* **Apache Maven**  
+  → utile per compilare e creare i jar automaticamente
+- Sistema operativo: macOS / Linux / Windows
 
 ---
 
 ## Compilazione ed esecuzione
 
-### Compilazione con Maven
+### Opzione 1 – Con Maven
+
+Assicurati di essere nella cartella principale del progetto (`AuctionSystem/`).
+
+#### Compilazione
 ```bash
 mvn clean package
 ```
 
-### Avvio del server
+#### Avvio del Server
 ```bash
-java -cp target/AuctionSystem-1.0-SNAPSHOT.jar it.unibz.auction.Server
+java -cp target/AuctionSystem-1.0-SNAPSHOT.jar it.unibz.auction.Server 5000
 ```
 
-### Avvio di un client
+> Se la porta 5000 è occupata, il server proverà automaticamente la successiva (5001, 5002, …).
+
+#### Avvio del Client
+In un altro terminale:
 ```bash
-java -cp target/AuctionSystem-1.0-SNAPSHOT.jar it.unibz.auction.Client <indirizzo_server>
+java -cp target/AuctionSystem-1.0-SNAPSHOT.jar it.unibz.auction.Client 127.0.0.1 5000
 ```
 
-All’avvio, l’utente sceglie un nickname e può:
-- Scrivere messaggi nella chat pubblica
-- Inviare offerte con `/bid <importo>`
-- Uscire dall’asta con `/quit`
+---
+
+### Opzione 2 – Senza Maven (solo Java)
+
+Dalla cartella principale (`AuctionSystem/`):
+
+#### Compila i file sorgenti
+```bash
+javac src/main/java/it/unibz/auction/*.java
+```
+
+#### Avvia il server
+```bash
+java -cp src/main/java it.unibz.auction.Server 5000
+```
+
+#### Avvia uno o più client
+```bash
+java -cp src/main/java it.unibz.auction.Client 127.0.0.1 5000
+```
+
+---
+
+## Comandi disponibili nel client
+
+| Comando | Descrizione |
+|----------|-------------|
+| `JOIN <nick>` | Entra nell’asta con un nickname unico |
+| `MSG <testo>` | Invia un messaggio nella chat pubblica |
+| `BID <valore>` | Effettua un’offerta sull’oggetto corrente |
+| `/info` | Mostra le informazioni attuali sull’asta e la porta attiva |
+| `/help` | Mostra la lista dei comandi disponibili |
+| `QUIT` | Disconnette il client in modo sicuro |
+
+---
+
+## 🧠 Esempio di sessione
+
+```
+✅ Connesso al server 127.0.0.1:5000
+──────────────────────────────
+COMANDI DISPONIBILI:
+──────────────────────────────
+JOIN alexei
+SYSTEM Ciao alexei
+──────────────────────────────
+👤 Utente: alexei
+🏷️  Oggetto in asta: Laptop
+💰 Prezzo attuale: 500.00
+⭐ Miglior offerente: Nessuno
+──────────────────────────────
+(Barra aggiornata automaticamente ogni 10 secondi)
+```
+
+---
+
+## Troubleshooting
+
+### Errore: `java.net.BindException: Address already in use`
+→ La porta è già occupata.  
+Soluzioni:
+- Usa una porta diversa (es. `5050`)
+- Oppure termina il processo che la usa:
+  ```bash
+  lsof -i :5000
+  kill -9 <PID>
+  ```
+
+### Errore: `Could not find or load main class`
+→ Sei nella directory sbagliata.  
+Esegui sempre i comandi **dalla cartella principale del progetto**:
+```bash
+java -cp src/main/java it.unibz.auction.Server 5000
+```
+
+### Errore: `mvn command not found`
+→ Maven non è installato o non è nel PATH.  
+Su macOS:
+```bash
+brew install maven
+```
+Verifica poi con:
+```bash
+mvn -v
+```
 
 ---
 
 ## Autori
+
 - **Andrea Zicarelli**
 - **Alexei Karavan**  
-  Corso di *Reti di Calcolatori*, A.A. 2025/2026
+  *Corso di Reti di Calcolatori – Università di Bolzano (A.A. 2025/2026)*
 
 ---
 
 ## Licenza
-Questo progetto è distribuito per scopi accademici e didattici.  
-L’uso o la modifica del codice è consentita previa citazione degli autori originali.
+
+Questo progetto è distribuito esclusivamente per scopi **accademici e didattici**.  
+L’utilizzo, la modifica o la distribuzione del codice sono consentiti previa citazione degli autori originali.
