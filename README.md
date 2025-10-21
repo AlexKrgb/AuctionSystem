@@ -1,6 +1,6 @@
 # TCP Auction – Online Auction System via TCP
 
-**TCP Auction** è un’applicazione client-server scritta in **Java** che simula un sistema di **asta online sincrona**, ispirato al funzionamento di piattaforme come *eBay*, ma basata su comunicazione diretta tramite **socket TCP**.  
+**TCP Auction** è un’applicazione client-server scritta in **Java** che simula un sistema di **asta online sincrona**, ispirato al funzionamento di piattaforme come *eBay*, ma basata su comunicazione diretta tramite **socket TCP**.
 
 ---
 
@@ -35,37 +35,52 @@ Ogni client è identificato da un nickname e può entrare o uscire liberamente d
 
 ## Struttura del progetto
 ```
-TCP-Auction/
-│
-├── src/
-│   ├── Server.java      # Gestione connessioni, offerte e messaggi
-│   ├── Client.java      # Interfaccia testuale e invio comandi
-│   └── utils/           # (eventuali classi di supporto)
+AuctionSystem/
 │
 ├── docs/
 │   └── Relazione_Tecnica.pdf
 │
-└── README.md            # Documentazione del progetto
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── it/
+│   │   │       └── unibz/
+│   │   │           └── auction/
+│   │   │               ├── Client.java      # Gestione del client TCP
+│   │   │               └── Server.java      # Gestione del server e delle aste
+│   │   └── resources/
+│   │
+│   └── test/
+│       └── java/
+│
+├── pom.xml
+└── README.md
 ```
 
 ---
 
 ## Requisiti
-- **Java 17+**
+- **Java 21+**
+- **Apache Maven**
 - IDE a scelta (IntelliJ, Eclipse, VS Code, ecc.)
 
 ---
 
-## Esecuzione
+## Compilazione ed esecuzione
+
+### Compilazione con Maven
+```bash
+mvn clean package
+```
 
 ### Avvio del server
 ```bash
-java Server
+java -cp target/AuctionSystem-1.0-SNAPSHOT.jar it.unibz.auction.Server
 ```
 
 ### Avvio di un client
 ```bash
-java Client <indirizzo_server>
+java -cp target/AuctionSystem-1.0-SNAPSHOT.jar it.unibz.auction.Client <indirizzo_server>
 ```
 
 All’avvio, l’utente sceglie un nickname e può:
@@ -77,8 +92,8 @@ All’avvio, l’utente sceglie un nickname e può:
 
 ## Autori
 - Andrea Zicarelli
-- Alexei Karavan
-Corso di *Reti di Calcolatori*, A.A. 2025/2026
+- Alexei Karavan  
+  Corso di *Reti di Calcolatori*, A.A. 2025/2026
 
 ---
 
