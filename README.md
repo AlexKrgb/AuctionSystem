@@ -1,6 +1,14 @@
 # TCP Auction – Online Auction System via TCP
 
-**TCP Auction** è un’applicazione client-server scritta in **Java** che simula un sistema di **asta online sincrona**, ispirato al funzionamento di piattaforme come *eBay*, ma basata su comunicazione diretta tramite **socket TCP**.
+[![Java](https://img.shields.io/badge/Java-21+-orange.svg)](https://www.oracle.com/java/)
+[![Maven](https://img.shields.io/badge/build-Maven-blue.svg)](https://maven.apache.org/)
+[![License](https://img.shields.io/badge/license-Academic-lightgrey.svg)](LICENSE)
+[![Status](https://img.shields.io/badge/status-Active-success.svg)]()
+
+---
+
+**TCP Auction** è un’applicazione client-server scritta in **Java** che simula un sistema di **asta online sincrona**, ispirato al funzionamento di piattaforme come *eBay*, ma basata su comunicazione diretta tramite **socket TCP**.  
+Il progetto è stato sviluppato come parte dell’assegnamento per il corso di *Reti di Calcolatori* (Autunno–Inverno 2025/2026).
 
 ---
 
@@ -91,12 +99,12 @@ All’avvio, l’utente sceglie un nickname e può:
 ---
 
 ## Autori
-- Andrea Zicarelli
-- Alexei Karavan  
+- **Andrea Zicarelli**
+- **Alexei Karavan**  
   Corso di *Reti di Calcolatori*, A.A. 2025/2026
 
 ---
 
 ## Licenza
 Questo progetto è distribuito per scopi accademici e didattici.  
-L’uso o la modifica del codice è consentita previa citazione dell’autore originale.
+L’uso o la modifica del codice è consentita previa citazione degli autori originali.
