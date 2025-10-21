@@ -134,7 +134,7 @@ java -cp src/main/java it.unibz.auction.Client 127.0.0.1 5000
 
 ---
 
-## 🧠 Esempio di sessione
+## Esempio di sessione
 
 ```
 ✅ Connesso al server 127.0.0.1:5000
@@ -145,7 +145,7 @@ JOIN alexei
 SYSTEM Ciao alexei
 ──────────────────────────────
 👤 Utente: alexei
-🏷️  Oggetto in asta: Laptop
+🏷️ Oggetto in asta: Laptop
 💰 Prezzo attuale: 500.00
 ⭐ Miglior offerente: Nessuno
 ──────────────────────────────
