@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class Server {
     private final int port;
+    private int activePort; // Porta effettivamente in uso
     private final Set<ClientHandler> clients = ConcurrentHashMap.newKeySet();
     private final Queue<AuctionItem> items = new ArrayDeque<>();
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -32,18 +33,43 @@ public class Server {
         // TODO: aggiungi altri
     }
 
-    private void start() throws IOException {
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
-            System.out.println("Server on port " + port);
-            startNextRound(); // avvia prima asta
+    private void start() throws IOException{
+        int maxRetries = 10; // Prova fino a 10 porte consecutive
+        int attempts = 0;
+        ServerSocket serverSocket = null;
+
+        while (attempts < maxRetries) {
+            try {
+                serverSocket = new ServerSocket(port + attempts);
+                activePort = port + attempts; // salva la porta effettiva
+                System.out.println("✅ Server avviato sulla porta " + activePort);
+                break;
+            } catch (IOException e) {
+                System.out.println("⚠️ Porta " + (port + attempts) + " occupata, provo la successiva...");
+                attempts++;
+            }
+        }
+
+        if (serverSocket == null) {
+            System.err.println("❌ Nessuna porta disponibile nelle prossime " + maxRetries + " porte. Uscita.");
+            return;
+        }
+
+        startNextRound();
+
+        try {
             while (true) {
                 Socket socket = serverSocket.accept();
                 ClientHandler h = new ClientHandler(socket, this);
                 clients.add(h);
                 new Thread(h).start();
             }
+        } catch (IOException e) {
+            System.err.println("Errore durante l'accettazione delle connessioni: " + e.getMessage());
         }
     }
+
+
 
     private void startNextRound() {
         synchronized (auctionLock) {
@@ -156,6 +182,22 @@ public class Server {
                     double val = Double.parseDouble(line.substring(4).trim());
                     registerBid(nickname, val, this);
                 } catch (NumberFormatException e) { out.println("BIDFAIL Valore non numerico"); }
+            } else if (line.equalsIgnoreCase("INFO_REQUEST")) {
+                // Risponde al client con le informazioni correnti sull’asta e la porta attiva
+                send("SYSTEM Informazioni attuali:");
+                send("SYSTEM Porta server: " + server.activePort);
+
+                synchronized (server.auctionLock) {
+                    if (server.currentItem != null) {
+                        send(String.format("INFO %s | Prezzo: %.2f | Incremento minimo: %.2f | Miglior offerente: %s",
+                                server.currentItem.name,
+                                server.currentPrice,
+                                server.currentItem.minInc,
+                                (server.topBidder != null ? server.topBidder : "Nessuno")));
+                    } else {
+                        send("SYSTEM Nessuna asta in corso.");
+                    }
+                }
             } else {
                 out.println("SYSTEM Comando sconosciuto");
             }

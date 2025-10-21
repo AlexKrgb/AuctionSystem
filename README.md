@@ -7,8 +7,7 @@
 
 ---
 
-**TCP Auction** è un’applicazione client-server scritta in **Java** che simula un sistema di **asta online sincrona**, ispirato al funzionamento di piattaforme come *eBay*, ma basata su comunicazione diretta tramite **socket TCP**.  
-Il progetto è stato sviluppato come parte dell’assegnamento per il corso di *Reti di Calcolatori* (Autunno–Inverno 2025/2026).
+**TCP Auction** è un’applicazione client-server scritta in **Java** che simula un sistema di **asta online sincrona**, ispirato al funzionamento di piattaforme come *eBay*, ma basata su comunicazione diretta tramite **socket TCP**.
 
 ---
 
