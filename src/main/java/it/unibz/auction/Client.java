@@ -40,7 +40,7 @@ public class Client {
             ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
             scheduler.scheduleAtFixedRate(Client::printStatusBar, 10, 10, TimeUnit.SECONDS);
 
-            // Thread scrittore (console → server)
+          
             Scanner sc = new Scanner(System.in);
             printHelp();
 

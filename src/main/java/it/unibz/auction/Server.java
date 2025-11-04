@@ -23,14 +23,14 @@ public class Server {
     public static void main(String[] args) throws Exception {
         int port = (args.length > 0) ? Integer.parseInt(args[0]) : 5000;
         Server s = new Server(port);
-        s.loadItems(); // TODO: carica lista
+        s.loadItems(); //
         s.start();
     }
 
     private void loadItems() {
         items.add(new AuctionItem("Laptop", "Ultrabook 14\"", 500.00, 10.00));
         items.add(new AuctionItem("Cuffie", "Over-ear", 50.00, 5.00));
-        // TODO: aggiungi altri
+        // Taggiungi altri
     }
 
     private void start() throws IOException{
