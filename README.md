@@ -1,65 +1,55 @@
-# TCP Auction – Online Auction System via TCP
+# Auction System – TCP & Java RMI
 
 [![Java](https://img.shields.io/badge/Java-21+-orange.svg)](https://www.oracle.com/java/)
 [![Maven](https://img.shields.io/badge/build-Maven-blue.svg)](https://maven.apache.org/)
-[![License](https://img.shields.io/badge/license-Academic-lightgrey.svg)](LICENSE)
-[![Status](https://img.shields.io/badge/status-Active-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-JUnit5-brightgreen.svg)]()
 
 ---
 
-**TCP Auction** è un’applicazione client-server scritta in **Java** che simula un sistema di **asta online sincrona**, ispirato al funzionamento di piattaforme come *eBay*, ma basata su comunicazione diretta tramite **socket TCP**.
+Questa repository contiene due implementazioni di un sistema d’asta online sincrono:
 
----
+- **Versione originale TCP**, basata su socket bloccanti (`it.unibz.auction.Server` e `Client`).
+- **Nuova versione Java RMI**, che sfrutta callback remoti per notificare in tempo reale i client (`it.unibz.auction.rmi.*`).
 
-## Descrizione del progetto
-Il sistema permette a molteplici client di connettersi a un server centrale per partecipare a un’asta online in tempo reale.  
-Oltre a effettuare offerte, gli utenti possono comunicare tra loro in una chat condivisa.  
-Ogni client è identificato da un nickname e può entrare o uscire liberamente dall’asta, purché il server sia attivo.
+Entrambe le varianti condividono i requisiti funzionali del primo assignment (chat, offerte concorrenti, gestione turni di asta), ma la versione RMI introduce un modello di interazione più semplice e robusto rispetto a guasti di rete e di processo.
 
----
+Per una descrizione dettagliata dell’architettura RMI e del confronto con la soluzione TCP, consultare:
 
-## Funzionalità principali
-- **Architettura client-server basata su TCP**
-- **Connessioni multiple simultanee**: più client possono partecipare alla stessa asta
-- **Chat condivisa**: tutti i messaggi vengono inoltrati a ogni client connesso
-- **Sistema d’asta sincrono**:
-  - Ogni oggetto ha un prezzo di partenza e un incremento minimo
-  - I client possono effettuare offerte tramite comando `/bid <importo>`
-  - Il server valida e diffonde in tempo reale l’offerta più alta
-- **Gestione sessione**:
-  - Comando `/quit` per disconnessione controllata
-  - Log server che registra azioni e messaggi
-- **Gestione robusta degli errori**: crash o disconnessioni di un client non compromettono il sistema
-- **Asta a tempo**: ogni sessione termina dopo un intervallo predefinito (es. 2 minuti), e l’oggetto viene assegnato al miglior offerente
-
----
-
-## Estensioni opzionali
-- Gestione dell’uscita del miglior offerente prima della chiusura dell’asta
-- Possibile versione alternativa basata su **UDP** per confronto delle prestazioni
+- `docs/RMI_Design.md` – progettazione e flussi di interazione.
+- `docs/RMI_Test_Report.md` – strategia di test e bug riscontrati.
+- `docs/RMI_vs_TCP.md` – analisi delle differenze rispetto alla versione socket.
 
 ---
 
 ## Struttura del progetto
+
 ```
 AuctionSystem/
 │
 ├── docs/
-│   └── Relazione_Tecnica.pdf
+│   ├── Relazione_Tecnica.pdf
+│   ├── RMI_Design.md
+│   ├── RMI_Test_Report.md
+│   └── RMI_vs_TCP.md
 │
 ├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── it/
-│   │   │       └── unibz/
-│   │   │           └── auction/
-│   │   │               ├── Client.java      # Gestione del client TCP
-│   │   │               └── Server.java      # Gestione del server e delle aste
-│   │   └── resources/
-│   │
-│   └── test/
-│       └── java/
+│   ├── main/java/it/unibz/auction/
+│   │   ├── Client.java                 # client TCP legacy
+│   │   └── Server.java                 # server TCP legacy
+│   └── main/java/it/unibz/auction/rmi/
+│       ├── AuctionService.java         # interfaccia remota
+│       ├── ClientCallback.java         # callback lato client
+│       ├── dto/
+│       │   ├── AuctionItem.java
+│       │   ├── AuctionState.java
+│       │   └── BidOutcome.java
+│       ├── exceptions/
+│       │   └── AuctionException.java
+│       ├── RMIClient.java              # client console basato su RMI
+│       └── RMIAuctionServer.java       # server RMI con gestione round
 │
+├── src/test/java/it/unibz/auction/rmi/
+│   └── RMIAuctionServerIT.java         # test end-to-end RMI
 ├── pom.xml
 └── README.md
 ```
@@ -67,122 +57,81 @@ AuctionSystem/
 ---
 
 ## Requisiti
-- **Java 21 o superiore**
-- *(Opzionale)* **Apache Maven**  
-  → utile per compilare e creare i jar automaticamente
-- Sistema operativo: macOS / Linux / Windows
+
+- Java 21+
+- Maven 3.9+ (per build e test)
+- Porta TCP disponibile per il registry RMI (default: `5099`)
 
 ---
 
-## Compilazione ed esecuzione
+## Build e test
 
-### Opzione 1 – Con Maven
-
-Assicurati di essere nella cartella principale del progetto (`AuctionSystem/`).
-
-#### Compilazione
 ```bash
-mvn clean package
+mvn clean verify
 ```
 
-#### Avvio del Server
-```bash
-java -cp target/AuctionSystem-1.0-SNAPSHOT.jar it.unibz.auction.Server 5000
-```
-
-> Se la porta 5000 è occupata, il server proverà automaticamente la successiva (5001, 5002, …).
-
-#### Avvio del Client
-In un altro terminale:
-```bash
-java -cp target/AuctionSystem-1.0-SNAPSHOT.jar it.unibz.auction.Client 127.0.0.1 5000
-```
+Il goal `verify` compila progetto, esegue i test JUnit5 (incluso il test end-to-end del server RMI) e produce il jar eseguibile in `target/auction-system-1.0-SNAPSHOT.jar`.
 
 ---
 
-### Opzione 2 – Senza Maven (solo Java)
+## Esecuzione – Versione Java RMI
 
-Dalla cartella principale (`AuctionSystem/`):
+### 1. Avvio del server RMI
 
-#### Compila i file sorgenti
 ```bash
-javac src/main/java/it/unibz/auction/*.java
+java -cp target/auction-system-1.0-SNAPSHOT.jar it.unibz.auction.rmi.RMIAuctionServer [portaRegistry] [nomeServizio] [tentativiPorta]
 ```
 
-#### Avvia il server
+- `portaRegistry` (default `5099`): porta del registro RMI.
+- `nomeServizio` (default `AuctionService`): nome con cui viene pubblicato il servizio.
+- `tentativiPorta` (default `5`): quanti fallback tentare in caso di conflitto di porta.
+
+Il server carica una coda di oggetti d’asta predefiniti, pianifica automaticamente i round e invia notifiche push ai client registrati.
+
+### 2. Avvio del client RMI
+
 ```bash
-java -cp src/main/java it.unibz.auction.Server 5000
+java -cp target/auction-system-1.0-SNAPSHOT.jar it.unibz.auction.rmi.RMIClient [host] [portaRegistry] [nomeServizio]
 ```
 
-#### Avvia uno o più client
-```bash
-java -cp src/main/java it.unibz.auction.Client 127.0.0.1 5000
-```
+All’avvio viene richiesto un nickname (validato), dopodiché il client:
+
+- riceve gli aggiornamenti sullo stato tramite callback (`onAuctionUpdate`);
+- visualizza i messaggi broadcast del server (`onSystemMessage`);
+- riceve l’esito delle offerte (`onBidOutcome`);
+- gestisce automaticamente la riconnessione con re-registrazione in caso di `RemoteException`.
+
+#### Comandi lato client
+
+| Comando         | Descrizione                                              |
+|-----------------|----------------------------------------------------------|
+| `BID <valore>`  | Effettua un’offerta (>= prezzo corrente + incremento)    |
+| `MSG <testo>`   | Invia un messaggio nella chat condivisa                  |
+| `/info`         | Richiede lo snapshot attuale dell’asta                   |
+| `/help`         | Mostra i comandi disponibili                             |
+| `/quit`         | Deregistra il client e termina l’applicazione            |
 
 ---
 
-## Comandi disponibili nel client
+## Esecuzione – Versione TCP legacy
 
-| Comando | Descrizione |
-|----------|-------------|
-| `JOIN <nick>` | Entra nell’asta con un nickname unico |
-| `MSG <testo>` | Invia un messaggio nella chat pubblica |
-| `BID <valore>` | Effettua un’offerta sull’oggetto corrente |
-| `/info` | Mostra le informazioni attuali sull’asta e la porta attiva |
-| `/help` | Mostra la lista dei comandi disponibili |
-| `QUIT` | Disconnette il client in modo sicuro |
+Resta disponibile per riferimento storico. Compilando il progetto è possibile avviare il server e i client originali:
+
+```bash
+java -cp target/auction-system-1.0-SNAPSHOT.jar it.unibz.auction.Server 5000
+java -cp target/auction-system-1.0-SNAPSHOT.jar it.unibz.auction.Client 127.0.0.1 5000
+```
+
+La nuova implementazione RMI non dipende dalla precedente, ma riutilizza la stessa logica di business (lista oggetti, regole di incremento, durata round).
 
 ---
 
-## Esempio di sessione
+## Documentazione di progetto
 
-```
-✅ Connesso al server 127.0.0.1:5000
-──────────────────────────────
-COMANDI DISPONIBILI:
-──────────────────────────────
-JOIN alexei
-SYSTEM Ciao alexei
-──────────────────────────────
-👤 Utente: alexei
-🏷️ Oggetto in asta: Laptop
-💰 Prezzo attuale: 500.00
-⭐ Miglior offerente: Nessuno
-──────────────────────────────
-(Barra aggiornata automaticamente ogni 10 secondi)
-```
-
----
-
-## Troubleshooting
-
-### Errore: `java.net.BindException: Address already in use`
-→ La porta è già occupata.  
-Soluzioni:
-- Usa una porta diversa (es. `5050`)
-- Oppure termina il processo che la usa:
-  ```bash
-  lsof -i :5000
-  kill -9 <PID>
-  ```
-
-### Errore: `Could not find or load main class`
-→ Sei nella directory sbagliata.  
-Esegui sempre i comandi **dalla cartella principale del progetto**:
-```bash
-java -cp src/main/java it.unibz.auction.Server 5000
-```
-
-### Errore: `mvn command not found`
-→ Maven non è installato o non è nel PATH.  
-Su macOS:
-```bash
-brew install maven
-```
-Verifica poi con:
-```bash
-mvn -v
-```
+- `Relazione_Tecnica.pdf` – documentazione originale dell’implementazione TCP.
+- `RMI_Design.md` – architettura, flussi RMI, strategie di robustezza.
+- `RMI_Test_Report.md` – casi di test automatici/manuali e bug individuati.
+- `RMI_vs_TCP.md` – discussione sui cambiamenti, vantaggi e svantaggi dell’adozione di RMI.
 
 ---
 
@@ -192,9 +141,9 @@ mvn -v
 - **Alexei Karavan**  
   *Corso di Reti di Calcolatori – Università di Bolzano (A.A. 2025/2026)*
 
----
+--- 
 
 ## Licenza
 
-Questo progetto è distribuito esclusivamente per scopi **accademici e didattici**.  
-L’utilizzo, la modifica o la distribuzione del codice sono consentiti previa citazione degli autori originali.
+Il progetto è destinato a scopi accademici e didattici.  
+La modifica o distribuzione del codice è permessa citando gli autori originali.
