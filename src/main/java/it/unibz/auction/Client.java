@@ -41,34 +41,35 @@ public class Client {
             scheduler.scheduleAtFixedRate(Client::printStatusBar, 10, 10, TimeUnit.SECONDS);
 
           
-            Scanner sc = new Scanner(System.in);
-            printHelp();
+            try (Scanner sc = new Scanner(System.in)) {
+                printHelp();
 
-            while (true) {
-                String cmd = sc.nextLine().trim();
+                while (true) {
+                    String cmd = sc.nextLine().trim();
 
-                // --- /help locale ---
-                if (cmd.equalsIgnoreCase("/help")) {
-                    printHelp();
-                    continue;
-                }
+                    // --- /help locale ---
+                    if (cmd.equalsIgnoreCase("/help")) {
+                        printHelp();
+                        continue;
+                    }
 
-                // --- /info locale ---
-                if (cmd.equalsIgnoreCase("/info")) {
-                    out.println("INFO_REQUEST");
-                    continue;
-                }
+                    // --- /info locale ---
+                    if (cmd.equalsIgnoreCase("/info")) {
+                        out.println("INFO_REQUEST");
+                        continue;
+                    }
 
-                // --- Aggiorna nickname se JOIN ---
-                if (cmd.toUpperCase().startsWith("JOIN ")) {
-                    String[] parts = cmd.split("\\s+", 2);
-                    if (parts.length > 1) nickname.set(parts[1]);
-                }
+                    // --- Aggiorna nickname se JOIN ---
+                    if (cmd.toUpperCase().startsWith("JOIN ")) {
+                        String[] parts = cmd.split("\\s+", 2);
+                        if (parts.length > 1) nickname.set(parts[1]);
+                    }
 
-                out.println(cmd);
-                if ("QUIT".equalsIgnoreCase(cmd)) {
-                    scheduler.shutdownNow(); // ferma l’aggiornamento automatico
-                    break;
+                    out.println(cmd);
+                    if ("QUIT".equalsIgnoreCase(cmd)) {
+                        scheduler.shutdownNow(); // ferma l’aggiornamento automatico
+                        break;
+                    }
                 }
             }
         }

@@ -1,5 +1,6 @@
 it\unibz\auction\Server$ClientHandler.class
 it\unibz\auction\rmi\RMIClient$ServiceCall.class
+submission\Client.class
 it\unibz\auction\rmi\RMIAuctionServer$ClientSession.class
 it\unibz\auction\rmi\ClientCallback.class
 it\unibz\auction\Server$AuctionItem.class
@@ -12,6 +13,7 @@ it\unibz\auction\rmi\dto\AuctionItem.class
 it\unibz\auction\rmi\exceptions\AuctionException.class
 it\unibz\auction\rmi\RMIClient$ServiceVoidCall.class
 it\unibz\auction\Client.class
+submission\Server.class
 it\unibz\auction\rmi\RMIClient.class
 it\unibz\auction\rmi\AuctionService.class
 it\unibz\auction\rmi\RMIClient$ClientListener.class
